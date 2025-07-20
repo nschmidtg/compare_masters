@@ -25,6 +25,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-web")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   developmentOnly("org.springframework.boot:spring-boot-devtools")
@@ -33,9 +34,9 @@ dependencies {
   testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
   testImplementation("org.springframework.security:spring-security-test")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-  implementation("javax.validation:validation-api")
-  implementation("javax.annotation:javax.annotation-api")
-  compileOnly("javax.servlet:javax.servlet-api")
+  implementation("org.openapitools:jackson-databind-nullable:0.2.6")
+  implementation("jakarta.annotation:jakarta.annotation-api")
+  compileOnly("jakarta.servlet:jakarta.servlet-api")
 }
 
 kotlin {
@@ -65,6 +66,7 @@ openApiGenerate {
       "delegatePattern" to "false",
       "interfaceOnly" to "true",
       "useResponseEntity" to "true",
+      "useJakartaEe" to "true"
     )
   )
 }

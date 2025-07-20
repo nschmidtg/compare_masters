@@ -7,18 +7,14 @@ paths:
   /songs:
     post:
       description: Create a new song
-      tags: ["Comments"]
+      tags: ["Songs"]
       operationId: "createSong"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [ title ]
-              properties:
-                title:
-                  type: string
+              $ref: "#/components/schemas/CreateSongRequest"
       responses:
         "200":
           description: Successful response
@@ -28,7 +24,7 @@ paths:
                 $ref: "#/components/schemas/SongVM"
     get:
       description: Returns all songs
-      tags: ["Comments"]
+      tags: ["Songs"]
       operationId: "getSongs"
       responses:
         "200":
@@ -40,7 +36,7 @@ paths:
   /songs/{song_id}:
     get:
       description: Returns a song by id
-      tags: ["Comments"]
+      tags: ["Songs"]
       operationId: "getSong"
       parameters:
         - name: song_id
@@ -66,13 +62,34 @@ components:
       "type": "array"
       "items":
         $ref: "#/components/schemas/SongVM"
+    CreateSongRequest:
+      type: object
+      required: [ title, artist, album, year ]
+      properties:
+        title:
+          type: string
+        artist:
+          type: string
+        album:
+          type: string
+        year:
+          type: integer
     SongVM:
       "type": "object"
       "required":
         - "id"
         - "title"
+        - "artist"
+        - "album"
+        - "year"
       "properties":
         id:
           type: "string"
         title:
           type: "string"
+        artist:
+          type: "string"
+        album:
+          type: "string"
+        year:
+          type: "integer"
