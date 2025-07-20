@@ -1,0 +1,78 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: JSON Placeholder API
+  description: See https://jsonplaceholder.typicode.com/
+paths:
+  /songs:
+    post:
+      description: Create a new song
+      tags: ["Comments"]
+      operationId: "createSong"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ title ]
+              properties:
+                title:
+                  type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/SongVM"
+    get:
+      description: Returns all songs
+      tags: ["Comments"]
+      operationId: "getSongs"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/SongsListVM"
+  /songs/{song_id}:
+    get:
+      description: Returns a song by id
+      tags: ["Comments"]
+      operationId: "getSong"
+      parameters:
+        - name: song_id
+          in: path
+          required: true
+          description: The song id.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful response
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/SongVM"
+        "404":
+          description: Song not found
+
+components:
+  schemas:
+    SongsListVM:
+      "type": "array"
+      "items":
+        $ref: "#/components/schemas/SongVM"
+    SongVM:
+      "type": "object"
+      "required":
+        - "id"
+        - "title"
+      "properties":
+        id:
+          type: "string"
+        title:
+          type: "string"
