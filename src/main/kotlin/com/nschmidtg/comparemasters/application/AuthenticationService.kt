@@ -13,6 +13,9 @@ class AuthenticationService(
 
     fun authenticate(email: String): Token {
         val user = userRepository.findByEmail(email)!!
+        if (!user.validated) {
+            throw RuntimeException("User not validated")
+        }
         return tokenService.createToken(user)
     }
 
