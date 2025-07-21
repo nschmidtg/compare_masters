@@ -18,5 +18,6 @@ data class Token(
     val refreshToken: String,
     val expiresAt: Instant,
     val issuedAt: Instant,
-    val refreshed: Boolean = false
+    val refreshed: Boolean = false,
+    var revoked: Boolean = false
 )
