@@ -35,6 +35,7 @@ dependencies {
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+  testImplementation("com.h2database:h2")
   implementation("org.openapitools:jackson-databind-nullable:0.2.6")
   implementation("jakarta.annotation:jakarta.annotation-api")
   compileOnly("jakarta.servlet:jakarta.servlet-api")
