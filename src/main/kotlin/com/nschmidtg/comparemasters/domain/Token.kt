@@ -14,10 +14,11 @@ import java.time.Instant
 data class Token(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
     @ManyToOne @JoinColumn(name = "user_id", nullable = false) val user: User,
-    val token: String,
-    val refreshToken: String,
-    val expiresAt: Instant,
-    val issuedAt: Instant,
-    val refreshed: Boolean = false,
+    var token: String,
+    var refreshToken: String,
+    var expiresAt: Instant,
+    var issuedAt: Instant,
     var revoked: Boolean = false
-)
+) {
+    fun isValid(): Boolean = !revoked && expiresAt.isAfter(Instant.now())
+}

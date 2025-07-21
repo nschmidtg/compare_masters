@@ -20,13 +20,17 @@ class AuthenticationService(
             throw RuntimeException("User not validated")
         }
 
-        val validUserTokens = tokenRepository.findAllValidTokenByUser(user.id!!)
-        if (validUserTokens.isNotEmpty()) {
-            val stillValidTokens =
-                validUserTokens.filter { it.expiresAt.isAfter(Instant.now()) }
-            if (stillValidTokens.isNotEmpty()) {
-                return stillValidTokens.first()
+        val userToken = tokenRepository.findByUserId(user.id!!)
+
+        if (userToken != null) {
+            if (userToken.revoked) {
+                throw RuntimeException("User access is revoked")
             }
+
+            if (userToken.expiresAt.isBefore(Instant.now())) {
+                return tokenService.refreshToken(userToken)
+            }
+            return userToken
         }
 
         return tokenService.createToken(user)

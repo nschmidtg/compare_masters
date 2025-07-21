@@ -2,6 +2,7 @@ package com.nschmidtg.comparemasters.infrastructure.web
 
 import com.nschmidtg.comparemasters.application.JpaUserDetailsService
 import com.nschmidtg.comparemasters.application.TokenService
+import com.nschmidtg.comparemasters.domain.TokenRepository
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -14,7 +15,8 @@ import org.springframework.web.filter.OncePerRequestFilter
 @Component
 class JwtAuthenticationFilter(
     private val userDetailsService: JpaUserDetailsService,
-    private val tokenService: TokenService
+    private val tokenService: TokenService,
+    private val tokenRepository: TokenRepository
 ) : OncePerRequestFilter() {
 
     override fun doFilterInternal(
@@ -34,9 +36,12 @@ class JwtAuthenticationFilter(
 
         if (SecurityContextHolder.getContext().authentication == null) {
             val userDetails = userDetailsService.loadUserByUsername(userEmail)
+            val isTokenValid =
+                tokenRepository.findByToken(jwt)?.isValid() ?: false
             if (
                 tokenService.validateToken(jwt, userDetails) &&
-                    userDetails.isEnabled
+                    userDetails.isEnabled &&
+                    isTokenValid
             ) {
                 val authToken =
                     UsernamePasswordAuthenticationToken(

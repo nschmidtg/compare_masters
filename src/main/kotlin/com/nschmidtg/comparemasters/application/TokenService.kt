@@ -55,6 +55,32 @@ class TokenService(
         return tokenRepository.save(tokenEntity)
     }
 
+    fun refreshToken(token: Token): Token {
+        val issuedAt = Instant.now()
+        val expiresAt = issuedAt.plusMillis(jwtExpiration)
+
+        token.token =
+            Jwts.builder()
+                .subject(token.user.email)
+                .issuedAt(Date.from(issuedAt))
+                .expiration(Date.from(expiresAt))
+                .signWith(secretKey)
+                .compact()
+
+        token.refreshToken =
+            Jwts.builder()
+                .subject(token.user.email)
+                .issuedAt(Date.from(issuedAt))
+                .expiration(Date.from(issuedAt.plusMillis(jwtExpiration * 10)))
+                .signWith(secretKey)
+                .compact()
+
+        token.issuedAt = issuedAt
+        token.expiresAt = expiresAt
+
+        return tokenRepository.save(token)
+    }
+
     fun parseToken(token: String): Claims {
         return Jwts.parser()
             .verifyWith(secretKey)
