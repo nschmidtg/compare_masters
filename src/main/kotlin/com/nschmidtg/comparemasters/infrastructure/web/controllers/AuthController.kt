@@ -25,8 +25,9 @@ class AuthController(private val authenticationService: AuthenticationService) {
     @PostMapping("/authenticate")
     fun authenticate(
         @RequestBody request: AuthenticationRequest
-    ): ResponseEntity<AuthenticationResponse> {
-        val token = authenticationService.authenticate(request.email)
-        return ResponseEntity.ok(AuthenticationResponse(token.token))
-    }
+    ): ResponseEntity<AuthenticationResponse>? =
+        authenticationService.authenticate(request.email).getOrNull()?.let {
+            ResponseEntity.ok(AuthenticationResponse(it.token))
+        }
+            ?: ResponseEntity.status(403).build()
 }
