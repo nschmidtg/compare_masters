@@ -33,6 +33,7 @@ dependencies {
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
   testImplementation("org.springframework.security:spring-security-test")
+  testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
   implementation("org.openapitools:jackson-databind-nullable:0.2.6")
   implementation("jakarta.annotation:jakarta.annotation-api")
@@ -95,4 +96,28 @@ sourceSets {
       srcDir("${layout.buildDirectory.get().asFile}/generate-resources/main/src/main/java")
     }
   }
+  val intTest by creating {
+    compileClasspath += sourceSets.main.get().output
+    runtimeClasspath += sourceSets.main.get().output
+    compileClasspath += sourceSets.test.get().compileClasspath
+    runtimeClasspath += sourceSets.test.get().runtimeClasspath
+  }
+}
+
+val intTest = task<Test>("intTest") {
+    description = "Runs integration tests."
+    group = "verification"
+
+    testClassesDirs = sourceSets["intTest"].output.classesDirs
+    classpath = sourceSets["intTest"].runtimeClasspath
+    useJUnitPlatform()
+}
+
+configurations {
+    val intTestImplementation by getting {
+        extendsFrom(configurations.testImplementation.get())
+    }
+    val intTestRuntimeOnly by getting {
+        extendsFrom(configurations.testRuntimeOnly.get())
+    }
 }
