@@ -95,4 +95,9 @@ class TokenService(
         val expiration = claims.expiration
         return username == userDetails.username && expiration.after(Date())
     }
+
+    fun isValid(token: Token): Boolean =
+        token.expiresAt.isAfter(Instant.now()) &&
+            !token.revoked &&
+            token.isIssuedDateValid(jwtExpiration)
 }

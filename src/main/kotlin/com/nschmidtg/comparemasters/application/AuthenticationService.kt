@@ -4,8 +4,6 @@ import com.nschmidtg.comparemasters.domain.Token
 import com.nschmidtg.comparemasters.domain.TokenRepository
 import com.nschmidtg.comparemasters.domain.User
 import com.nschmidtg.comparemasters.domain.UserRepository
-import java.time.Instant
-import kotlin.Result.Companion.success
 import org.springframework.stereotype.Service
 
 @Service
@@ -16,25 +14,34 @@ class AuthenticationService(
 ) {
 
     fun authenticate(email: String): Result<Token> = runCatching {
-        val user = userRepository.findByEmail(email)!!
-        if (!user.validated) {
-            throw RuntimeException("User not validated")
-        }
-
-        val userToken = tokenRepository.findByUserId(user.id!!)
-
-        if (userToken != null) {
-            if (userToken.revoked) {
-                throw RuntimeException("User access is revoked")
+        userRepository.findByEmail(email)?.let { user ->
+            if (!user.validated)
+                throw UserNotValidatedException("User not validated")
+            tokenRepository.findByUserId(user.id)?.let {
+                it.takeIf(tokenService::isValid)
+                    ?: throw TokenExpiredOrRevokedException(
+                        "User access is revoked or token is expired"
+                    )
             }
-
-            if (userToken.expiresAt.isBefore(Instant.now())) {
-                return success(tokenService.refreshToken(userToken))
-            }
-            return success(userToken)
+                ?: throw TokenNotFoundForUserException(
+                    "Token not found for user"
+                )
         }
+            ?: throw UserNotFoundException("User not found")
+    }
 
-        return success(tokenService.createToken(user))
+    fun refresh(refreshToken: String): Result<Token> = runCatching {
+        tokenRepository
+            .findByRefreshToken(refreshToken)
+            ?.takeIf { !it.revoked }
+            ?.let { validToken ->
+                if (!validToken.user.validated)
+                    throw UserNotValidatedException("User not validated")
+                tokenService.refreshToken(validToken)
+            }
+            ?: throw TokenExpiredOrRevokedException(
+                "User access is revoked or token is expired"
+            )
     }
 
     fun register(email: String, gecos: String): User {
@@ -42,3 +49,11 @@ class AuthenticationService(
         return userRepository.save(user)
     }
 }
+
+class UserNotFoundException(msg: String) : RuntimeException(msg)
+
+class UserNotValidatedException(msg: String) : RuntimeException(msg)
+
+class TokenExpiredOrRevokedException(msg: String) : RuntimeException(msg)
+
+class TokenNotFoundForUserException(msg: String) : RuntimeException(msg)

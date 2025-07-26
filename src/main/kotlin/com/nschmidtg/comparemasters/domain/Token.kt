@@ -20,5 +20,7 @@ data class Token(
     var issuedAt: Instant,
     var revoked: Boolean = false
 ) {
-    fun isValid(): Boolean = !revoked && expiresAt.isAfter(Instant.now())
+
+    fun isIssuedDateValid(jwtExpirationMillis: Long): Boolean =
+        issuedAt.plusMillis(jwtExpirationMillis).isAfter(Instant.now())
 }
