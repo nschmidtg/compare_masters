@@ -6,6 +6,7 @@ import com.nschmidtg.comparemasters.infrastructure.web.api.SongsApi
 import com.nschmidtg.comparemasters.infrastructure.web.model.CreateSongRequest
 import com.nschmidtg.comparemasters.infrastructure.web.model.SongVM
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.transaction.Transactional
 import jakarta.validation.Valid
 import java.util.UUID
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1")
+@SecurityRequirement(name = "BearerAuth")
 class SongController(private val songRepository: SongRepository) : SongsApi {
 
     @Transactional
