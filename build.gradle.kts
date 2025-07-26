@@ -64,8 +64,8 @@ openApiGenerate {
   generatorName.set("spring")
   inputSpec.set("$rootDir/specs/spec.yaml")
   packageName.set("com.nschmidtg")
-  apiPackage.set("openapi.generated.api")
-  modelPackage.set("openapi.generated.model")
+  apiPackage.set("com.nschmidtg.comparemasters.infrastructure.web.api")
+    modelPackage.set("com.nschmidtg.comparemasters.infrastructure.web.model")
   configOptions.putAll(
     mapOf(
       "delegatePattern" to "false",

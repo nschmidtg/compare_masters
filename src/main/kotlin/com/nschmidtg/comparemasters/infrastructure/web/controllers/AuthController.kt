@@ -1,33 +1,55 @@
 package com.nschmidtg.comparemasters.infrastructure.web.controllers
 
 import com.nschmidtg.comparemasters.application.AuthenticationService
-import com.nschmidtg.comparemasters.infrastructure.web.viewmodels.AuthenticationRequest
-import com.nschmidtg.comparemasters.infrastructure.web.viewmodels.AuthenticationResponse
-import com.nschmidtg.comparemasters.infrastructure.web.viewmodels.RegistrationRequest
+import com.nschmidtg.comparemasters.infrastructure.web.api.AuthApi
+import com.nschmidtg.comparemasters.infrastructure.web.model.AuthenticationRequest
+import com.nschmidtg.comparemasters.infrastructure.web.model.AuthenticationResponse
+import com.nschmidtg.comparemasters.infrastructure.web.model.RefreshRequest
+import com.nschmidtg.comparemasters.infrastructure.web.model.RegistrationRequest
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/auth")
-class AuthController(private val authenticationService: AuthenticationService) {
-
-    @PostMapping("/register")
-    fun register(
-        @RequestBody request: RegistrationRequest
+class AuthController(private val authenticationService: AuthenticationService) :
+    AuthApi {
+    override fun login(
+        registrationRequest: RegistrationRequest
     ): ResponseEntity<Void> {
-        authenticationService.register(request.email, request.gecos)
+        authenticationService.login(
+            registrationRequest.idToken,
+        )
         return ResponseEntity.ok().build()
     }
 
-    @PostMapping("/authenticate")
-    fun authenticate(
-        @RequestBody request: AuthenticationRequest
-    ): ResponseEntity<AuthenticationResponse>? =
-        authenticationService.authenticate(request.email).getOrNull()?.let {
-            ResponseEntity.ok(AuthenticationResponse(it.token))
-        }
+    override fun authenticate(
+        authenticationRequest: AuthenticationRequest
+    ): ResponseEntity<AuthenticationResponse> =
+        authenticationService
+            .authenticate(authenticationRequest.token)
+            .getOrNull()
+            ?.let {
+                ResponseEntity.ok(
+                    AuthenticationResponse().apply {
+                        token = it.token
+                        refreshToken = it.refreshToken
+                    }
+                )
+            }
+            ?: ResponseEntity.status(403).build()
+
+    override fun refresh(
+        refreshRequest: RefreshRequest
+    ): ResponseEntity<AuthenticationResponse> =
+        authenticationService
+            .refresh(refreshRequest.refreshToken)
+            .getOrNull()
+            ?.let {
+                ResponseEntity.ok(
+                    AuthenticationResponse().apply {
+                        token = it.token
+                        refreshToken = it.refreshToken
+                    }
+                )
+            }
             ?: ResponseEntity.status(403).build()
 }

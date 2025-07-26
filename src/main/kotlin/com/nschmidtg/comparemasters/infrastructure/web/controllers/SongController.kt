@@ -2,14 +2,14 @@ package com.nschmidtg.comparemasters.infrastructure.web.controllers
 
 import com.nschmidtg.comparemasters.domain.SongRepository
 import com.nschmidtg.comparemasters.domain.Songs
+import com.nschmidtg.comparemasters.infrastructure.web.api.SongsApi
+import com.nschmidtg.comparemasters.infrastructure.web.model.CreateSongRequest
+import com.nschmidtg.comparemasters.infrastructure.web.model.SongVM
 import io.swagger.v3.oas.annotations.Parameter
 import jakarta.transaction.Transactional
 import jakarta.validation.Valid
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
-import openapi.generated.api.SongsApi
-import openapi.generated.model.CreateSongRequest
-import openapi.generated.model.SongVM
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController

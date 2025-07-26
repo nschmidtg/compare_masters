@@ -2,7 +2,6 @@ package com.nschmidtg.comparemasters.application
 
 import com.nschmidtg.comparemasters.domain.Token
 import com.nschmidtg.comparemasters.domain.TokenRepository
-import com.nschmidtg.comparemasters.domain.User
 import com.nschmidtg.comparemasters.domain.UserRepository
 import org.springframework.stereotype.Service
 
@@ -13,21 +12,16 @@ class AuthenticationService(
     private val tokenRepository: TokenRepository
 ) {
 
-    fun authenticate(email: String): Result<Token> = runCatching {
-        userRepository.findByEmail(email)?.let { user ->
-            if (!user.validated)
+    fun authenticate(token: String): Result<Token> = runCatching {
+        tokenRepository.findByToken(token)?.let {
+            if (!it.user.validated)
                 throw UserNotValidatedException("User not validated")
-            tokenRepository.findByUserId(user.id)?.let {
-                it.takeIf(tokenService::isValid)
-                    ?: throw TokenExpiredOrRevokedException(
-                        "User access is revoked or token is expired"
-                    )
-            }
-                ?: throw TokenNotFoundForUserException(
-                    "Token not found for user"
+            it.takeIf(tokenService::isValid)
+                ?: throw TokenExpiredOrRevokedException(
+                    "User access is revoked or token is expired"
                 )
         }
-            ?: throw UserNotFoundException("User not found")
+            ?: throw TokenNotFoundForUserException("Token not found for user")
     }
 
     fun refresh(refreshToken: String): Result<Token> = runCatching {
@@ -44,9 +38,8 @@ class AuthenticationService(
             )
     }
 
-    fun register(email: String, gecos: String): User {
-        val user = User(email = email, gecos = gecos)
-        return userRepository.save(user)
+    fun login(idToken: String): Token {
+        TODO()
     }
 }
 

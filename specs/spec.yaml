@@ -3,6 +3,9 @@ info:
   version: 1.0.0
   title: JSON Placeholder API
   description: See https://jsonplaceholder.typicode.com/
+
+servers:
+  - url: api/v1
 paths:
   /songs:
     post:
@@ -56,6 +59,56 @@ paths:
         "404":
           description: Song not found
 
+  /auth/login:
+    post:
+      description: Login a new user or signup
+      tags: ["Auth"]
+      operationId: "login"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationRequest"
+      responses:
+        "200":
+          description: Successful response
+  /auth/authenticate:
+    post:
+      description: Authenticate a user with a jwt token
+      tags: ["Auth"]
+      operationId: "authenticate"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthenticationRequest"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AuthenticationResponse"
+  /auth/refresh:
+    post:
+      description: Refresh a token
+      tags: ["Auth"]
+      operationId: "refresh"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshRequest"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AuthenticationResponse"
 components:
   schemas:
     SongsListVM:
@@ -93,3 +146,29 @@ components:
           type: "string"
         year:
           type: "integer"
+    RegistrationRequest:
+      type: object
+      required: [ idToken ]
+      properties:
+        idToken:
+          type: string
+    AuthenticationRequest:
+      type: object
+      required: [ token ]
+      properties:
+        token:
+          type: string
+    AuthenticationResponse:
+      type: object
+      required: [ token, refreshToken ]
+      properties:
+        token:
+          type: string
+        refreshToken:
+          type: string
+    RefreshRequest:
+      type: object
+      required: [ refreshToken ]
+      properties:
+        refreshToken:
+          type: string
