@@ -12,18 +12,6 @@ class AuthenticationService(
     private val tokenRepository: TokenRepository
 ) {
 
-    fun authenticate(token: String): Result<Token> = runCatching {
-        tokenRepository.findByToken(token)?.let {
-            if (!it.user.validated)
-                throw UserNotValidatedException("User not validated")
-            it.takeIf(tokenService::isValid)
-                ?: throw TokenExpiredOrRevokedException(
-                    "User access is revoked or token is expired"
-                )
-        }
-            ?: throw TokenNotFoundForUserException("Token not found for user")
-    }
-
     fun refresh(refreshToken: String): Result<Token> = runCatching {
         tokenRepository
             .findByRefreshToken(refreshToken)

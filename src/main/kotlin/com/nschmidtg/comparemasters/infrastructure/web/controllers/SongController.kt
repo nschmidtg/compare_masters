@@ -12,9 +12,11 @@ import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@RequestMapping("/api/v1")
 class SongController(private val songRepository: SongRepository) : SongsApi {
 
     @Transactional
